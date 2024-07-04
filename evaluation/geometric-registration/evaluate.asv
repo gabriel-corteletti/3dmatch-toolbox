@@ -46,9 +46,6 @@ for sceneIdx = 1:length(sceneList)
     % Check if any valid transformation was found
     if ~sucess
         disp(['Skipping scene because no valid transformations were found for: ', sceneList{sceneIdx}]);
-        % Append NaN to totalRecall and totalPrecision
-        totalRecall = [totalRecall; NaN];
-        totalPrecision = [totalPrecision; NaN];
         continue    % skips to next scene
     end
 
@@ -58,22 +55,14 @@ for sceneIdx = 1:length(sceneList)
     totalPrecision = [totalPrecision;precision];
 end
 
-% Create table for CSV export
-T = table(sceneList', ...
-          cellstr(num2str(totalRecall, '%.4f')), ...
-          cellstr(num2str(totalPrecision, '%.4f')), ...
-          'VariableNames', {'Scene', 'Recall', 'Precision'});
 
-% Calculate TOTAL averages
-totalAvgRecall = mean(totalRecall(~isnan(totalRecall)));
-totalAvgPrecision = mean(totalPrecision(~isnan(totalPrecision)));
 
-% Add TOTAL row
-T(end+1, :) = {'TOTAL', num2str(totalAvgRecall, '%.4f'), num2str(totalAvgPrecision, '%.4f')};
 
-% Write table to CSV
-writetable(T, 'registration_evaluation.csv');
 
-% Display total averages
-fprintf('Total average registration recall: %.4f\n', mean(totalRecall(~isnan(totalRecall))));
-fprintf('Total average registration precision: %.4f\n', mean(totalPrecision(~isnan(totalPrecision))));
+
+
+if isempty(totalRecall) || isempty(totalPrecision)
+    fprintf('No valid data to compute mean registration recall and precision.\n');
+else
+    fprintf('Mean registration recall: %f precision: %f\n', mean(totalRecall), mean(totalPrecision));
+end
